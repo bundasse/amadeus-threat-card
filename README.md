@@ -1,6 +1,6 @@
 # amadeus-threat-card
 
-## Table of contents
+## 목차
 
 - [개요](#개요)
   - [스크린샷](#스크린샷)
@@ -23,7 +23,7 @@ TRPG 게임인 '신화창세RPG 아마데우스'에서 사용하는 카드를 �
 
 ### 링크
 
-- Live Site URL: [Add live site URL here](http://bundasse.dothome.co.kr/)
+- Live Site URL: [링크](http://bundasse.dothome.co.kr/)
 
 ## 개발과정
 
