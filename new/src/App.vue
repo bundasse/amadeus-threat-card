@@ -122,14 +122,6 @@
               <button @click="Reset()" class="bg-rose-500 hover:bg-rose-300 text-white hover:text-black text-center px-5 py-2 rounded-lg">리셋하기</button>
               <button @click="SaveFile()" class="bg-green-500 ml-5 hover:bg-green-300 text-white hover:text-black text-center px-5 py-2 rounded-lg">이미지 다운로드</button>
             </div>
-            <p class="text-gray-600 text-sm mt-5 w-4/5">
-              <span class="text-xl">※주의사항</span>
-              <ul class="list-disc ml-10">
-                <li>공식 사이트의 본체/위협카드 배포 이미지를 잘라 사용했습니다. 아직 이미지가 일본어로 되어있습니다.</li>
-                <li>모바일에서는 이미지 사이즈와 폰트 배치가 왜곡되어 제대로 생성되지 않을 수 있습니다.</li>
-                <li>제작자의 지식이 부족하여 [다른 이름으로 저장]이 아직 구현되지 않았습니다. 조속한 시일 내로 힘내보겠습니다.</li>
-              </ul>
-            </p>
           </div>
         </div>
 
