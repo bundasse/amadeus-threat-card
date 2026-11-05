@@ -124,7 +124,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
     <div class="max-w-7xl mx-auto bg-gray-800 text-gray-400 p-10 text-sm">
