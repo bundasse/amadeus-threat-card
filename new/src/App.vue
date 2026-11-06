@@ -38,7 +38,7 @@
               </div>
               <!-- 위협카드 텍스트 -->
               <!-- <img src="/card_monster.png" :alt="imageUrl" width="591" height="887"> -->
-              <img :src="require(`@/assets/${imageUrl}`)" :alt="imageUrl" width="591" height="887">
+              <img :src="cardImage" :alt="imageUrl" width="591" height="887">
             </div>
           </div>
           <!-- 텍스트 입력 공간 -->
@@ -132,72 +132,74 @@
   </div>
 </template>
 
-<script>
-import domtoimage from 'dom-to-image';
-import FileSaver from 'file-saver';
-export default {
-  name: 'App',
-  data() {
-    return {
-      name:"",
-      imageUrl: "card_threat.png",
-      tags:'',
-      level:1,
-      mAttr: "적",
-      tAttr: "공격",
-      tDice:'무용',
-      tDamage:'',
-      attack:null,
-      guard:null,
-      hp:null,
-      desc:'',
-      effect:'',
-      nameFontSize:"text-5xl"
-    }
-  },
-  components: {
-  },
-  methods: {
-    SaveFile(){
-      var node = this.$refs.capture;
-        domtoimage.toBlob(node).then(function (blob) {
-          FileSaver.saveAs(blob);
-        });
-    },
-    check(){
-      if(this.attack){
-        return this.attack = this.attack.replace(/[^0-9+-]/g, '');     
-      }
-      if(this.guard){
-        return this.guard = this.guard.replace(/[^0-9+-]/g, '');     
-      }
-      if(this.level){
-        return this.level = this.level.replace(/[^0-9]/g, '');     
-      }
-      if(this.hp){
-        return this.hp = this.hp.replace(/[^0-9]/g, '');     
-      }
-      if(this.tDamage){
-        return this.tDamage = this.tDamage.replace(/[^0-9+-dD]/g, '');     
-      }
-    },
-    Reset(){
-      this.name=""
-      this.tags=''
-      this.level=1
-      this.mAttr= "적"
-      this.tAttr= "공격"
-      this.tDice='무용'
-      this.tDamage=''
-      this.attack=null
-      this.guard=null
-      this.hp=null
-      this.desc=''
-      this.effect=''
-    }
-  },
-  watch:{
+<script setup>
+import { computed, ref } from "vue";
+import domtoimage from "dom-to-image";
+import FileSaver from "file-saver";
+
+// 카드 입력값
+const name = ref("");
+const imageUrl = ref("card_threat.png");
+const tags = ref("");
+const level = ref(1);
+const mAttr = ref("적");
+const tAttr = ref("공격");
+const tDice = ref("무용");
+const tDamage = ref("");
+const attack = ref(null);
+const guard = ref(null);
+const hp = ref(null);
+const desc = ref("");
+const effect = ref("");
+const nameFontSize = ref("text-5xl");
+
+// 이미지로 저장할 카드 DOM (template ref)
+const capture = ref(null);
+
+// 카드 배경 이미지 경로 (assets 폴더 기준)
+const cardImage = computed(() => require(`@/assets/${imageUrl.value}`));
+
+function SaveFile() {
+  domtoimage.toBlob(capture.value).then(function (blob) {
+    FileSaver.saveAs(blob);
+  });
+}
+
+function check() {
+  if (attack.value) {
+    attack.value = attack.value.replace(/[^0-9+-]/g, "");
+    return;
   }
+  if (guard.value) {
+    guard.value = guard.value.replace(/[^0-9+-]/g, "");
+    return;
+  }
+  if (level.value) {
+    level.value = String(level.value).replace(/[^0-9]/g, "");
+    return;
+  }
+  if (hp.value) {
+    hp.value = hp.value.replace(/[^0-9]/g, "");
+    return;
+  }
+  if (tDamage.value) {
+    tDamage.value = tDamage.value.replace(/[^0-9+-dD]/g, "");
+  }
+}
+
+function Reset() {
+  name.value = "";
+  tags.value = "";
+  level.value = 1;
+  mAttr.value = "적";
+  tAttr.value = "공격";
+  tDice.value = "무용";
+  tDamage.value = "";
+  attack.value = null;
+  guard.value = null;
+  hp.value = null;
+  desc.value = "";
+  effect.value = "";
 }
 </script>
 

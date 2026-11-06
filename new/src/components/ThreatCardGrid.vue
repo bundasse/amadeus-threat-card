@@ -4,112 +4,116 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { onBeforeUnmount, onMounted, ref } from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import "tabulator-tables/dist/css/tabulator.min.css";
 
-export default {
-  name: "ThreatCardGrid",
-  props: {
-    // 초기 데이터 (없으면 빈 그리드)
-    rows: {
-      type: Array,
-      default: () => [],
-    },
-    height: {
-      type: String,
-      default: "500px",
-    },
+const props = defineProps({
+  // 초기 데이터 (없으면 빈 그리드)
+  rows: {
+    type: Array,
+    default: () => [],
   },
-  emits: ["update:rows"],
-  data() {
-    return {
-      table: null,
-    };
+  height: {
+    type: String,
+    default: "500px",
   },
-  mounted() {
-    this.table = new Tabulator(this.$refs.gridEl, {
-      data: this.rows,
-      height: this.height,
-      layout: "fitColumns",
-      // 붙여넣기(엑셀에서 복사 → Ctrl+V) 활성화
-      clipboard: true,
-      clipboardPasteAction: "insert",
-      editTriggerEvent: "dblclick",
-      placeholder: "데이터가 없습니다.",
-      columns: [
-        { title: "이름", field: "name", editor: "input", widthGrow: 2 },
-        { title: "태그", field: "tags", editor: "input", widthGrow: 2 },
-        {
-          title: "레벨",
-          field: "level",
-          editor: "number",
-          editorParams: { min: 1, max: 99 },
-          hozAlign: "center",
-          width: 80,
-        },
-        { title: "공격력", field: "attack", editor: "input", hozAlign: "center", width: 90 },
-        { title: "방어력", field: "guard", editor: "input", hozAlign: "center", width: 90 },
-        { title: "생명력", field: "hp", editor: "input", hozAlign: "center", width: 90 },
-        {
-          title: "묘사",
-          field: "desc",
-          editor: "textarea",
-          editorParams: { verticalNavigation: "editor" },
-          widthGrow: 3,
-        },
-        {
-          title: "효과",
-          field: "effect",
-          editor: "textarea",
-          editorParams: { verticalNavigation: "editor" },
-          widthGrow: 3,
-        },
-      ],
-    });
+});
 
-    this.table.on("dataChanged", (data) => {
-      this.$emit("update:rows", data);
-    });
-  },
-  beforeUnmount() {
-    if (this.table) {
-      this.table.destroy();
-      this.table = null;
-    }
-  },
-  methods: {
-    // 현재 그리드 데이터를 JSON(배열)으로 반환
-    getJson() {
-      return this.table ? this.table.getData() : [];
-    },
-    // JSON(배열)로 그리드 데이터 교체
-    setJson(rows) {
-      if (this.table) {
-        this.table.replaceData(rows || []);
-      }
-    },
-    // 빈 행 추가 / 선택한 행 삭제
-    addRow(row) {
-      if (this.table) {
-        this.table.addRow(row || {});
-      }
-    },
-    deleteSelected() {
-      if (!this.table) return;
-      const rows = this.table.getSelectedRows();
-      if (rows.length) {
-        this.table.deleteRow(rows);
-      }
-    },
-    // CSV 파일 가져오기 (xlsx는 SheetJS 별도 등록 필요)
-    importCsv() {
-      if (this.table) {
-        this.table.import("csv", ".csv");
-      }
-    },
-  },
-};
+const emit = defineEmits(["update:rows"]);
+
+const gridEl = ref(null);
+let table = null;
+
+onMounted(() => {
+  table = new Tabulator(gridEl.value, {
+    data: props.rows,
+    height: props.height,
+    layout: "fitColumns",
+    // 붙여넣기(엑셀에서 복사 → Ctrl+V) 활성화
+    clipboard: true,
+    clipboardPasteAction: "insert",
+    editTriggerEvent: "dblclick",
+    placeholder: "데이터가 없습니다.",
+    columns: [
+      { title: "이름", field: "name", editor: "input", widthGrow: 2 },
+      { title: "태그", field: "tags", editor: "input", widthGrow: 2 },
+      {
+        title: "레벨",
+        field: "level",
+        editor: "number",
+        editorParams: { min: 1, max: 99 },
+        hozAlign: "center",
+        width: 80,
+      },
+      { title: "공격력", field: "attack", editor: "input", hozAlign: "center", width: 90 },
+      { title: "방어력", field: "guard", editor: "input", hozAlign: "center", width: 90 },
+      { title: "생명력", field: "hp", editor: "input", hozAlign: "center", width: 90 },
+      {
+        title: "묘사",
+        field: "desc",
+        editor: "textarea",
+        editorParams: { verticalNavigation: "editor" },
+        widthGrow: 3,
+      },
+      {
+        title: "효과",
+        field: "effect",
+        editor: "textarea",
+        editorParams: { verticalNavigation: "editor" },
+        widthGrow: 3,
+      },
+    ],
+  });
+
+  table.on("dataChanged", (data) => {
+    emit("update:rows", data);
+  });
+});
+onBeforeUnmount(() => {
+  if (table) {
+    table.destroy();
+    table = null;
+  }
+});
+
+// 현재 그리드 데이터를 JSON(배열)으로 반환
+function getJson() {
+  return table ? table.getData() : [];
+}
+
+// JSON(배열)로 그리드 데이터 교체
+function setJson(rows) {
+  if (table) {
+    table.replaceData(rows || []);
+  }
+}
+
+// 빈 행 추가 / 선택한 행 삭제
+function addRow(row) {
+  if (table) {
+    table.addRow(row || {});
+  }
+}
+
+function deleteSelected() {
+  if (!table) return;
+  const rows = table.getSelectedRows();
+  if (rows.length) {
+    table.deleteRow(rows);
+  }
+}
+
+// CSV 파일 가져오기 (xlsx는 SheetJS 별도 등록 필요)
+function importCsv() {
+  if (table) {
+    table.import("csv", ".csv");
+  }
+}
+
+// 부모에서 ref 로 접근할 수 있도록 메서드 노출
+defineExpose({ getJson, setJson, addRow, deleteSelected, importCsv });
 </script>
 
 <style>

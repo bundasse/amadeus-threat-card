@@ -12,6 +12,8 @@
     "core-js": "^3.8.3",
     "dom-to-image": "^2.6.0",
     "file-saver": "^2.0.5",
+    "html-to-image": "^1.11.13",
+    "jszip": "^3.10.2",
     "postcss": "^8.4.23",
     "tabulator-tables": "^6.7.1",
     "tailwindcss": "^3.3.2",
@@ -29,7 +31,8 @@
   "eslintConfig": {
     "root": true,
     "env": {
-      "node": true
+      "node": true,
+      "vue/setup-compiler-macros": true
     },
     "extends": [
       "plugin:vue/vue3-essential",
