@@ -5,6 +5,13 @@
         <h1 class="basis-full text-5xl font-bold py-10 ml-5 mb-10">신화창세RPG 아마데우스 본체/위협 카드 생성기</h1>
         <div class="w-full flex flex-wrap">
           <!-- 카드 이미지 출력 공간 -->
+
+          <div>
+            <ThreatCardGrid/>
+          </div>
+          <div>
+            <CardBatchDownload>
+          </div>
           <div class="basis-full xl:basis-[49%] xl:order-1 order-2 text-center">
             <div ref="capture" class="relative inline-block">
               <!-- 본체카드 텍스트 -->
@@ -136,6 +143,8 @@
 import { computed, ref } from "vue";
 import domtoimage from "dom-to-image";
 import FileSaver from "file-saver";
+import ThreatCardGrid from "@/components/ThreatCardGrid.vue";
+import CardBatchDownload from "@/components/CardBatchDownload.vue";
 
 // 카드 입력값
 const name = ref("");
