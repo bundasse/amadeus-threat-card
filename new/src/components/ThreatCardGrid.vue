@@ -10,7 +10,6 @@ import { TabulatorFull as Tabulator } from "tabulator-tables";
 import "tabulator-tables/dist/css/tabulator.min.css";
 
 const props = defineProps({
-  // 초기 데이터 (없으면 빈 그리드)
   rows: {
     type: Array,
     default: () => [],
