@@ -8,6 +8,7 @@
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import { TabulatorFull as Tabulator } from "tabulator-tables";
 import "tabulator-tables/dist/css/tabulator.min.css";
+import { buildColumns, getCardTypeConfig, SANITIZERS, sanitizeValue } from "@/constants/cardTypes";
 
 const props = defineProps({
   rows: {
@@ -18,7 +19,20 @@ const props = defineProps({
     type: String,
     default: "500px",
   },
+  // 카드 종류 (threat = 위협 / monster = 괴물) — 컬럼 구성과 기본값이 달라진다
+  cardType: {
+    type: String,
+    default: "threat",
+  },
 });
+
+// 카드 종류별 컬럼에 편집 시 값 정화(mutatorEdit)를 결합
+// (cardType 은 생성 시 고정이므로 마운트 시점에 한 번만 만든다)
+const columns = buildColumns(props.cardType).map((column) =>
+  SANITIZERS[column.field]
+    ? { ...column, mutatorEdit: (value) => sanitizeValue(column.field, value) }
+    : { ...column }
+);
 
 const emit = defineEmits(["update:rows"]);
 
@@ -35,35 +49,7 @@ onMounted(() => {
     clipboardPasteAction: "insert",
     editTriggerEvent: "dblclick",
     placeholder: "데이터가 없습니다.",
-    columns: [
-      { title: "이름", field: "name", editor: "input", widthGrow: 2 },
-      { title: "태그", field: "tags", editor: "input", widthGrow: 2 },
-      {
-        title: "레벨",
-        field: "level",
-        editor: "number",
-        editorParams: { min: 1, max: 99 },
-        hozAlign: "center",
-        width: 80,
-      },
-      { title: "공격력", field: "attack", editor: "input", hozAlign: "center", width: 90 },
-      { title: "방어력", field: "guard", editor: "input", hozAlign: "center", width: 90 },
-      { title: "생명력", field: "hp", editor: "input", hozAlign: "center", width: 90 },
-      {
-        title: "묘사",
-        field: "desc",
-        editor: "textarea",
-        editorParams: { verticalNavigation: "editor" },
-        widthGrow: 3,
-      },
-      {
-        title: "효과",
-        field: "effect",
-        editor: "textarea",
-        editorParams: { verticalNavigation: "editor" },
-        widthGrow: 3,
-      },
-    ],
+    columns,
   });
 
   table.on("dataChanged", (data) => {
@@ -89,10 +75,11 @@ function setJson(rows) {
   }
 }
 
-// 빈 행 추가 / 선택한 행 삭제
+// 빈 행 추가 (카드 종류별 기본값 병합) / 선택한 행 삭제
 function addRow(row) {
   if (table) {
-    table.addRow(row || {});
+    const defaults = getCardTypeConfig(props.cardType).defaults;
+    table.addRow({ ...defaults, ...(row || {}) });
   }
 }
 
@@ -116,6 +103,11 @@ defineExpose({ getJson, setJson, addRow, deleteSelected, importCsv });
 </script>
 
 <style>
+/* 그리드 에디터 입력값 가운데 정렬 (구 App.vue 의 input 규칙 대체) */
+.threat-grid input {
+  text-align: center;
+}
+
 /* 밝은 테마 (Tabulator 기본 CSS 위에 덮어쓰기) */
 .threat-grid .tabulator {
   background-color: #ffffff;

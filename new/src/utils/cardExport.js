@@ -150,7 +150,8 @@ export async function printCards(elements) {
 
   const pageStyle = doc.createElement("style");
   pageStyle.textContent = `
-    @page { size: A4 portrait; margin: 10mm; }
+    /* 인쇄는 카드 기본 크기(591x887) 그대로 출력한다. A4 규격에 맞춰 확대/축소하지 않는다. */
+    @page { size: auto; margin: 10mm; }
     html, body { margin: 0; padding: 0; background: #fff; }
     .print-item {
       width: ${CARD_WIDTH}px;

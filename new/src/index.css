@@ -15,3 +15,12 @@
     font-weight: normal;
     font-style: normal;
 }
+
+/* 카드 렌더 전용 전역 클래스 (구 App.vue 스타일 이관) */
+.numText {
+    font-family: 'BMDOHYEON';
+}
+
+.tStroke {
+    text-shadow: 3px 0 #fff, 0 3px #fff, -3px 0 #fff, 0 -3px #fff;
+}

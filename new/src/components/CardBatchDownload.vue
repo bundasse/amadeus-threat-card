@@ -1,5 +1,24 @@
 <template>
   <div class="w-full">
+    <!-- 규격 선택 (카드 생성/저장 버튼 위) -->
+    <div class="flex flex-wrap items-center gap-4 mb-3">
+      <span class="text-sm font-bold text-slate-700">규격 :</span>
+      <label
+        class="flex items-center gap-1 text-sm font-bold"
+        :class="locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
+      >
+        <input type="radio" value="print" v-model="sizeMode" :disabled="locked" />
+        인쇄규격 <span class="font-normal text-slate-400">({{ printSizeLabel }})</span>
+      </label>
+      <label
+        class="flex items-center gap-1 text-sm font-bold"
+        :class="locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
+      >
+        <input type="radio" value="shrink" v-model="sizeMode" :disabled="locked" />
+        축소규격 <span class="font-normal text-slate-400">({{ shrinkSizeLabel }})</span>
+      </label>
+    </div>
+
     <!-- 컨트롤 -->
     <div class="flex flex-wrap items-center gap-3">
       <select
@@ -57,7 +76,13 @@
 <script setup>
 import { computed, nextTick, ref } from "vue";
 import ThreatCardFace from "./ThreatCardFace.vue";
-import { downloadCardsZip, printCards as printCardsToWindow } from "@/utils/cardExport";
+import {
+  CARD_HEIGHT,
+  CARD_WIDTH,
+  downloadCardsZip,
+  printCards as printCardsToWindow,
+} from "@/utils/cardExport";
+import { getCardTypeConfig, sanitizeValue } from "@/constants/cardTypes";
 
 const props = defineProps({
   // Tabulator 그리드에서 넘어온 행 데이터 배열
@@ -65,12 +90,17 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  // zip 파일명 (생략 시 cards_타임스탬프)
+  // 카드 종류 (threat = 위협 / monster = 괴물) — 이미지와 카드 필드 구성이 달라진다
+  cardType: {
+    type: String,
+    default: "threat",
+  },
+  // zip 파일명 (생략 시 카드 종류별 접두어 + 타임스탬프)
   fileName: {
     type: String,
     default: "",
   },
-  // 이미지 배율 (2 = 1182 x 1774)
+  // 이미지 배율 (2 = 1182 x 1774). 축소규격은 이 값의 50%
   pixelRatio: {
     type: Number,
     default: 2,
@@ -81,7 +111,10 @@ const props = defineProps({
   },
 });
 
+const config = computed(() => getCardTypeConfig(props.cardType));
+
 const format = ref(props.defaultFormat);
+const sizeMode = ref("print"); // print = 인쇄규격 / shrink = 축소규격
 const busy = ref(false);
 const printing = ref(false);
 const canceled = ref(false);
@@ -100,26 +133,51 @@ const progressPercent = computed(() => {
   return Math.round((done.value / total.value) * 100);
 });
 
-// 그리드 행 데이터 -> 카드 props 로 변환 (없는 값은 기본값)
+// 저장 이미지 배율 (축소규격 = 인쇄규격의 50%)
+const exportPixelRatio = computed(() =>
+  sizeMode.value === "shrink" ? props.pixelRatio / 2 : props.pixelRatio
+);
+
+function sizeLabel(ratio) {
+  return `${Math.round(CARD_WIDTH * ratio)} × ${Math.round(CARD_HEIGHT * ratio)}`;
+}
+
+const printSizeLabel = computed(() => sizeLabel(props.pixelRatio));
+const shrinkSizeLabel = computed(() => sizeLabel(props.pixelRatio / 2));
+
+// 카드 이름은 v-html 로 렌더되므로 개행을 <br> 로 변환한다
+// (구 App.vue 의 "<br> 입력 시 줄바꿈" 규칙 + 엑셀 셀 개행 지원)
+function toCardHtml(value) {
+  return String(value == null ? "" : value).replace(/\r\n|\r|\n/g, "<br>");
+}
+
+// 그리드 행 데이터 -> 카드 props 로 변환 (카드 종류에 해당하는 필드만 전달)
 function normalizeRow(row = {}) {
   const name = row.name || "";
   const card = {
-    imageUrl: row.imageUrl || row.cardType || "card_threat.png",
-    name,
+    cardType: config.value.type,
+    imageUrl: config.value.imageUrl,
+    name: toCardHtml(name),
     tags: row.tags || "",
-    level: row.level ?? 1,
-    mAttr: row.mAttr || "적",
-    tAttr: row.tAttr || row.attr || "공격",
-    tDice: row.tDice || row.dice || "무용",
-    tDamage: row.tDamage ?? row.damage ?? "",
-    attack: row.attack ?? null,
-    guard: row.guard ?? null,
-    hp: row.hp ?? null,
+    level: sanitizeValue("level", row.level) || 1,
+    attack: sanitizeValue("attack", row.attack) || null,
+    guard: sanitizeValue("guard", row.guard) || null,
+    hp: sanitizeValue("hp", row.hp) || null,
     desc: row.desc || "",
     effect: row.effect || "",
   };
-  // 이름이 길면 App.vue 와 동일하게 작은 글씨 사용
-  card.nameFontSize = row.nameFontSize || (name.length > 14 ? "text-4xl" : "text-5xl");
+
+  // 괴물 카드는 mAttr, 위협 카드는 tAttr/tDice/tDamage 를 사용한다
+  if (config.value.type === "monster") {
+    card.mAttr = row.mAttr || "적";
+  } else {
+    card.tAttr = row.tAttr || "공격";
+    card.tDice = row.tDice || "무용";
+    card.tDamage = sanitizeValue("tDamage", row.tDamage);
+  }
+
+  // 이름이 길면 작은 글씨 (구 App.vue 의 text-4xl 규칙 유지)
+  card.nameFontSize = name.length > 14 ? "text-4xl" : "text-5xl";
   return card;
 }
 
@@ -149,9 +207,9 @@ async function downloadZip() {
     total.value = items.length;
 
     await downloadCardsZip(items, {
-      fileName: props.fileName || `cards_${Date.now()}`,
+      fileName: props.fileName || `${config.value.fileNamePrefix}_${Date.now()}`,
       format: format.value,
-      pixelRatio: props.pixelRatio,
+      pixelRatio: exportPixelRatio.value,
       onProgress: (count, countTotal) => {
         done.value = count;
         total.value = countTotal;
@@ -159,7 +217,7 @@ async function downloadZip() {
       shouldCancel: () => canceled.value,
     });
 
-    message.value = `${total.value}장 다운로드 완료`;
+    message.value = `${total.value}장 다운로드 완료 (${sizeLabel(exportPixelRatio.value)})`;
   } catch (e) {
     if (e && e.message === "CANCELED") {
       message.value = "다운로드를 취소했습니다.";
@@ -188,6 +246,7 @@ async function printAll() {
 
     if (!stage.value) throw new Error("카드 렌더 영역을 찾을 수 없습니다.");
 
+    // 인쇄는 카드 기본 크기 그대로 출력 (규격 선택 영향 없음)
     await printCardsToWindow(stage.value.querySelectorAll(".card-export-item"));
     message.value = "인쇄 창을 열었습니다. (카드 1장 = 1페이지)";
   } catch (e) {
