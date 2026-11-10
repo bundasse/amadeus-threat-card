@@ -5,14 +5,12 @@
       <span class="font-bold text-lg text-slate-800">{{ config.label }}</span>
       <span class="text-slate-500 text-sm">({{ rows.length }}행)</span>
       <span class="flex-1"></span>
-      <button
-        class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm px-3 py-1.5 rounded-lg"
+      <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm px-3 py-1.5 rounded-lg"
         @click="gridRef && gridRef.addRow()"
       >
         행 추가
       </button>
-      <button
-        class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm px-3 py-1.5 rounded-lg"
+      <button class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm px-3 py-1.5 rounded-lg"
         @click="gridRef && gridRef.deleteSelected()"
       >
         선택 삭제
