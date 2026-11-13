@@ -47,7 +47,7 @@ export const CARD_TYPES = {
   },
   monster: {
     type: "monster",
-    label: "괴물 카드", // 구 UI 표기: "본체 카드"
+    label: "본체 카드", // 구 UI 표기: "본체 카드"
     imageUrl: "card_monster.png",
     fileNamePrefix: "monster_cards",
     hpLabel: "생명력",
