@@ -82,7 +82,7 @@ import {
   downloadCardsZip,
   printCards as printCardsToWindow,
 } from "@/utils/cardExport";
-import { getCardTypeConfig, sanitizeValue } from "@/constants/cardTypes";
+import { findMissingCells, getCardTypeConfig, sanitizeValue } from "@/constants/cardTypes";
 
 const props = defineProps({
   // Tabulator 그리드에서 넘어온 행 데이터 배열
@@ -188,6 +188,13 @@ function buildCards(rows) {
 
 async function downloadZip() {
   if (locked.value) return;
+
+  // 필수 항목이 비어 있으면 카드를 만들지 않고 안내
+  const missing = findMissingCells(props.rows, props.cardType);
+  if (missing.length) {
+    window.alert(`값이 입력되지 않은 셀이 있습니다:\n${missing.join("\n")}`);
+    return;
+  }
 
   isError.value = false;
   message.value = "";

@@ -7,6 +7,7 @@
  * - hpLabel        : hp 컬럼 헤더 (내구도 / 생명력)
  * - attrField      : 속성 필드명 (위협 tAttr / 괴물 mAttr)
  * - defaults       : 새 행 추가 시 기본값
+ * - requiredFields : 다운로드 전 반드시 입력해야 하는 컬럼 (비어 있으면 alert)
  * - extraColumns   : 카드 종류에만 있는 컬럼 (위협: 판정, 위력)
  */
 
@@ -24,6 +25,8 @@ export const CARD_TYPES = {
       tDice: "무용",
       tDamage: "",
     },
+    // 다운로드 전 필수 입력 컬럼 (레벨 / 위력 / 공격치 / 방어치 / 내구도)
+    requiredFields: ["level", "tDamage", "attack", "guard", "hp"],
     extraColumns: [
       {
         title: "판정",
@@ -56,6 +59,8 @@ export const CARD_TYPES = {
     defaults: {
       mAttr: "적",
     },
+    // 다운로드 전 필수 입력 컬럼 (생명력 / 이름 / 태그 / 레벨 / 공격치 / 방어치)
+    requiredFields: ["hp", "name", "tags", "level", "attack", "guard"],
     extraColumns: [],
   },
 };
@@ -137,4 +142,40 @@ export function buildColumns(type) {
       widthGrow: 2,
     },
   ];
+}
+
+/**
+ * 필드명 -> 컬럼 헤더 매핑 (검증 메시지에 컬럼명을 표시하기 위함)
+ * @param {"threat"|"monster"} type 카드 종류
+ */
+export function getFieldTitles(type) {
+  return buildColumns(type).reduce((titles, column) => {
+    titles[column.field] = column.title;
+    return titles;
+  }, {});
+}
+
+/**
+ * 카드 종류별 필수 컬럼이 비어 있는 셀을 찾는다.
+ * @param {Array<object>} rows 그리드 행 데이터
+ * @param {"threat"|"monster"} type 카드 종류
+ * @returns {string[]} "n행 (컬럼명)" 형태의 목록 (비어 있으면 빈 배열)
+ */
+export function findMissingCells(rows, type) {
+  const cfg = getCardTypeConfig(type);
+  const titles = getFieldTitles(type);
+  const missing = [];
+
+  (rows || []).forEach((row, index) => {
+    cfg.requiredFields.forEach((field) => {
+      const value = row ? row[field] : null;
+      // 0 은 유효한 값으로 본다 (빈 문자열/공백/null/undefined 만 미입력)
+      const isEmpty = value === null || value === undefined || String(value).trim() === "";
+      if (isEmpty) {
+        missing.push(`${index + 1}행 (${titles[field] || field})`);
+      }
+    });
+  });
+
+  return missing;
 }

@@ -76,4 +76,15 @@ const gridRef = ref(null);
 function onRowsUpdate(newRows) {
   rows.value = newRows;
 }
+
+// 그리드의 모든 행 삭제 (탭 상단 "그리드 초기화" 버튼에서 호출)
+function clearRows() {
+  if (gridRef.value) {
+    gridRef.value.clearRows();
+  }
+  rows.value = [];
+}
+
+// 부모(탭)에서 ref 로 접근할 수 있도록 노출
+defineExpose({ clearRows });
 </script>

@@ -83,6 +83,14 @@ function addRow(row) {
   }
 }
 
+// 모든 행 삭제 (행이 없는 상태로 초기화)
+function clearRows() {
+  if (!table) return;
+  table.clearData();
+  // clearData() 의 dataChanged 가 발생하지 않는 버전도 있어 직접 알린다
+  emit("update:rows", []);
+}
+
 function deleteSelected() {
   if (!table) return;
   const rows = table.getSelectedRows();
@@ -99,7 +107,7 @@ function importCsv() {
 }
 
 // 부모에서 ref 로 접근할 수 있도록 메서드 노출
-defineExpose({ getJson, setJson, addRow, deleteSelected, importCsv });
+defineExpose({ getJson, setJson, addRow, clearRows, deleteSelected, importCsv });
 </script>
 
 <style>
