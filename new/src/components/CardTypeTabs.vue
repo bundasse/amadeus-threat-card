@@ -55,8 +55,11 @@ function clearActiveGrid() {
   const panel = active.value === "threat" ? threatPanel.value : monsterPanel.value;
   if (!panel) return;
 
+  // 탭 라벨에 따라 문구가 달라진다
+  //  - 위협 탭: "위협 카드 데이터 목록을 모두 지울까요?"
+  //  - 본체 탭: "본체 카드 데이터 목록을 모두 지울까요?"
   const label = CARD_TYPES[active.value].label;
-  if (!window.confirm(`${label} 그리드의 입력값을 모두 지웁니다. 계속할까요?`)) return;
+  if (!window.confirm(`${label} 데이터 목록을 모두 지울까요?`)) return;
 
   panel.clearRows();
 }
