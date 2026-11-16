@@ -27,7 +27,7 @@
         class="bg-rose-50 hover:bg-rose-100 text-rose-600 text-sm font-bold px-3 py-1.5 rounded-lg border border-rose-200"
         @click="clearActiveGrid"
       >
-        그리드 초기화
+        데이터 초기화
       </button>
     </div>
 
