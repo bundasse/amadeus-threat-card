@@ -274,7 +274,6 @@ defineExpose({ downloadZip, printAll });
 </script>
 
 <style scoped>
-/* 사용자 화면 밖에 렌더링해서 캡처 (display:none 이면 레이아웃이 계산되지 않음) */
 .card-export-stage {
   position: fixed;
   top: 0;
