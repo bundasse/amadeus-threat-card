@@ -8,14 +8,14 @@
         :class="locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
       >
         <input type="radio" value="print" v-model="sizeMode" :disabled="locked" />
-        인쇄규격 <span class="font-normal text-slate-400">({{ printSizeLabel }})</span>
+        인쇄용 사이즈 <span class="font-normal text-slate-400">({{ printSizeLabel }})</span>
       </label>
       <label
         class="flex items-center gap-1 text-sm font-bold"
         :class="locked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
       >
         <input type="radio" value="shrink" v-model="sizeMode" :disabled="locked" />
-        축소규격 <span class="font-normal text-slate-400">({{ shrinkSizeLabel }})</span>
+        축소 사이즈 <span class="font-normal text-slate-400">({{ shrinkSizeLabel }})</span>
       </label>
     </div>
 
