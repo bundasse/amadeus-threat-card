@@ -19,7 +19,6 @@
       </label>
     </div>
 
-    <!-- 컨트롤 -->
     <div class="flex flex-wrap items-center gap-3">
       <select
         v-model="format"
