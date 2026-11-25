@@ -5,7 +5,7 @@
       <CardTypeTabs />
     </div>
     <div class="max-w-7xl mx-auto bg-gray-800 text-gray-400 p-10 text-sm">
-      페이지 제작자: 녹조하임 (트위터 <a href="https://twitter.com/FF14_dasse" class="underline">@FF14_dasse</a>)
+      페이지 제작: 녹조하임 (트위터 <a href="https://twitter.com/FF14_dasse" class="underline">@FF14_dasse</a>)
     </div>
   </div>
 </template>
